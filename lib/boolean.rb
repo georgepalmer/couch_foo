@@ -1,0 +1,3 @@
+class Boolean < TrueClass
+  
+end

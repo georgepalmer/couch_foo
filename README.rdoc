@@ -1,0 +1,113 @@
+= CouchFoo
+
+== Overview
+
+CouchFoo provides an ActiveRecord styled interface to CouchDB.  The external API is nearly identical 
+to ActiveRecord so it should be possible to migrate your applications quite easily.  That said, there
+are a few minor differences to the way CouchDB works.  In particular:
+* CouchDB is schema free so property defintions for the document are defined in the model (like DataMapper)
+* :select, :joins, :having, :group, :from and :lock are not available on find or associations as they don't apply (locking is handled as conflict resolution at insertion time)
+* :conditions can only accept a hash and not an array or SQL.  For example :conditions => {:user_name => "Georgio_1999"}
+* :offset is less efficient in CouchDB - there's more on this in the rdoc
+* :order is applied after results are retrieved from the database.  Therefore :order cannot be used with :limit without a new option :use_key.  This is explained fully in the quick start guide and CouchFoo#find documentation
+* :include isn't implemented yet but the finders and associations still accept the option so you won't need to make any code changes
+* By default results are ordered by document key.  The key uses a UUID scheme so these don't auto-increment and are likely to come out in a different order to insertion.  default_sort can be used on a model to sort by create date by default and overcome this
+* validates_uniqueness_of has had the :case_sensitive option removed
+* Because there's no SQL there's no SQL finder methods
+* Timezones, aggregations and fixtures are not yet implemented
+* The price of index updating is paid when next accessing the index rather than the point of insertion.  This can be more efficient or less depending on your application.  It may make sense to use an external process to do the updating for you - see CouchFoo#find for more on this
+* On that note, occasional compacting of CouchDB is required to recover space from old versions of documents.  This can be kicked off in several ways (see quick start guide)
+
+It is recommend that you read the quick start and performance sections in the rdoc for a full overview of differences and points to be aware of when developing.
+
+
+== Getting started
+
+CouchFoo::Base.set_database("http://localhost:5984/opnli_dev", <yourcouchdbversion>)
+
+If using with Rails you will need to create an initializer to do this (until proper integration is added)
+
+
+== Examples of usage
+
+Basic operations are the same as ActiveRecord:
+  class Address < CouchFoo::Base
+    property :number, Integer
+    property :street, String
+    property :postcode # Any generic type is fine as long as .to_json can be called on it
+  end 
+
+  address1 = Address.create(:number => 3, :street => "My Street", :postcode => "secret") # Create address
+  address2 = Address.create(:number => 27, :street => "Another Street", :postcode => "secret")
+  Address.find.all # = [address1, address2] or maybe [address2, address2] depending on key generation
+  Address.first    # = address1 or address2 depending on keys so probably isn't as expected
+  Address.find_by_street("My Street") # = address1
+
+As key generation is through a UUID scheme, the order can be predicted.  However you can order the
+results by default:
+  class Address < CouchFoo::Base
+    property :number, Integer
+    property :street, String
+    property :postcode # Any generic type is fine as long as .to_json can be called on it
+    property :created_at, DateTime
+    
+    default_sort :created_at
+  end
+  
+  Address.find.all # = [address1, address2]
+  Address.first    # = address1 or address2, sorting is applied after results
+  Address.first(:use_key => :created_at) # = address1 but at the price of creating a new index
+
+Conditions work slightly differently:
+  Address.find(:all, :conditions {:street => "My Street"}) # = address1, creates index on :street
+  Address.find(:all, :conditions {:created_at => "sometime"}) # Uses same index as :use_key => :created_at
+  Address.find(:all, :use_key => :street, :startkey => 'p') # All streets from p in alphabet, reuses the index created 2 lines up
+
+As well as providing support for people using relational databases, CouchFoo attempts to provide a library for those wanting to use CouchDB as a document-orientated database:
+  class Document < CouchFoo::Base
+    property :number, Integer
+    property :street, String
+    
+    view :number_ordered, "function(doc) {emit([doc.number , doc.street], doc); }", nil, :descending => true
+  end
+
+  Document.number_ordered(:limit => 75) # Will get the last 75 documents in the database ordered by number, street attributes
+
+Associations work as expected but you must to remember to add the properties required for an association (we'll make this automatic soon):
+  class House < CouchFoo::Base
+  	has_many :windows
+  end
+  
+  class Window < CouchFoo::Base
+    property :house_id, String
+  	belongs_to :house
+  end
+
+
+== Credits
+
+This gem was inspired some excellent work on CouchPotato, CouchREST, ActiveCouch and RelaxDB gems.  Each offered
+its own benefits and own challenges.  After hacking with each I couldn't get a library was happy with.  So I
+started with ActiveRecord and modified it to work with CouchDB.  Some areas required more work than others but
+a lot of features were achieved for free once the base level of functionality had been achieved.  Credit to DHH,
+the rails core guys and the CouchDB gems that inspired this work. 
+
+
+== What's left to do?
+
+Please feel free to fork and hit me with a request to merge back in.  At the moment, the following areas need addressing:
+
+* Proper integration with rails using a couchdb.yml config file
+* Example ruby script for updating indexes as an external process, and the same for database compacting  
+* :include for database queries
+* Remove dependency from CouchRest?  Add support for attachments and log calls to server so know performance times.  General tidy up of database.rb
+* inline and HABTM inline associations.  Also x_id and x_type properties should be automatically defined
+* compatability with willpaginate and friends
+* cleanup of associations, reflection, validations classes (were modified in a rush)
+* has_many :through
+* Rest of calculations, timezones, aggregations and fixtures
+* Diff with AR to check got everything in
+* DataMapper interface
+* Tool to migrate DB from MySQL to CouchDB
+* some kind of generic admin interface where can just browse around data structure?
+* grep of code and doc for records and columns, should be documents and attributes
