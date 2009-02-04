@@ -4,11 +4,15 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
     s.name = "couch_foo"
-    s.summary = %Q{TODO}
+    s.summary = %Q{CouchFoo provides an ActiveRecord API interface to CouchDB}
     s.email = "george.palmer@gmail.com"
     s.homepage = "http://github.com/georgepalmer/couch_foo"
-    s.description = "TODO"
+    s.description = "CouchFoo provides an ActiveRecord API interface to CouchDB"
     s.authors = ["George Palmer"]
+    s.add_dependency "json", [">=0"]
+    s.add_dependency "activesupport", [">=0"]
+    s.add_dependency "jchris-couchrest", [">=0.9.12"]
+    s.add_dependency "uuid", [">=2.0"]
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
