@@ -621,8 +621,8 @@ module CouchFoo
           finder_class = class_hierarchy.detect { |klass| !klass.abstract_class? }
           
           scope = {configuration[:scope] => record.send(configuration[:scope])} if configuration[:scope] 
-          result = finder_class.count_view(:conditions => {attr_name => value}.merge(scope || {}))
-          unless result == 0
+          result = finder_class.find_view(:conditions => {attr_name => value}.merge(scope || {}))
+          if !result.empty? && result.first.send(:_id) != record.send(:_id)
             record.errors.add(attr_name, configuration[:message])
           end
         end

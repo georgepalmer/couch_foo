@@ -43,7 +43,7 @@ Basic operations are the same as ActiveRecord:
   Address.first    # = address1 or address2 depending on keys so probably isn't as expected
   Address.find_by_street("My Street") # = address1
 
-As key generation is through a UUID scheme, the order can be predicted.  However you can order the
+As key generation is through a UUID scheme, the order can't be predicted.  However you can order the
 results by default:
   class Address < CouchFoo::Base
     property :number, Integer
