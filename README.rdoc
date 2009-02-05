@@ -23,7 +23,8 @@ It is recommend that you read the quick start and performance sections in the rd
 
 == Getting started
 
-CouchFoo::Base.set_database("http://localhost:5984/opnli_dev", <yourcouchdbversion>)
+  CouchFoo::Base.set_database("http://localhost:5984/opnli_dev", <yourcouchdbversion>)
+  CouchFoo::Base.logger = Rails.logger
 
 If using with Rails you will need to create an initializer to do this (until proper integration is added)
 

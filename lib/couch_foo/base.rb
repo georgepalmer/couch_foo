@@ -203,6 +203,7 @@ module CouchFoo
   # follwing will do the trick:
   #
   #   CouchFoo::Base.set_database("http://localhost:5984/opnli_dev", 0.8)  
+  #   CouchFoo::Base.logger = Rails.logger
   #
   # A few tidbits:
   # * When specifying associations you still need to specify the object_id and object_type (if using polymorphic association) properties.  We have this automated as part of the association macro soon  
