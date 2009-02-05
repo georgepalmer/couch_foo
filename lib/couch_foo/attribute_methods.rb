@@ -119,9 +119,8 @@ module CouchFoo
       end
       
       # Define an attribute reader method
-      def define_read_method(symbol)
-        access_code = "@attributes['#{symbol}']"
-        evaluate_attribute_method symbol.to_s, "def #{symbol}; read_attribute('#{access_code}'); end" 
+      def define_read_method(attr_name)
+        evaluate_attribute_method attr_name, "def #{attr_name}; read_attribute('#{attr_name}'); end" 
       end
       
       # Defines a predicate method <tt>attr_name?</tt>
