@@ -109,7 +109,7 @@ module CouchFoo
   #   class Address < CouchFoo::Base
   #     property :number, Integer
   #     property :street, String
-  #     property :postcode # Any generic type is fine as long as .to_json can be called on it
+  #     property :postcode # Any generic type is fine as long as .to_json and class.from_json(json) can be called on it
   #   end
   #
   # Documents have three more properties that get added automatically.  _id and _rev are CouchDB
@@ -1030,9 +1030,11 @@ module CouchFoo
       
       # Set a property for the document.  These can be passed a type and options hash.  If no type
       # is passed a #to_json method is called on the ruby object and the result stored in the 
-      # database.  If a type is passed then the object is cast before storing in the database.  This
-      # does not guarantee that the object is the correct type (use the validaters for that), it
-      # merely tries to convert the current type to the desired one - for example:
+      # database.  When it is retrieved from the database a class.from_json(json) method is called
+      # on it or if that doesn't exist it just uses the value.  If a type is passed then the object
+      # is cast before storing in the database.  This does not guarantee that the object is the
+      # correct type (use the validaters for that), it merely tries to convert the current type to
+      # the desired one - for example:
       # '123' => 123 # useful
       # 'a' => 0 # probably not desired behaviour
       # The later would fail with a validator
@@ -1046,10 +1048,11 @@ module CouchFoo
       #   property :number, Integer
       #   property :paid, TrueClass, :default => false
       #   property :notes, String
-      #   property :acl
+      #   property :acl # or acl, Object is equivalent
+      #   property :price, Price
       # end  
-      def property(name, type = nil, options = {})
-        logger.warn("Using type as a column name may issue unexpected behaviour") if name == :type
+      def property(name, type = Object, options = {})
+        logger.warn("Using type as a property name may issue unexpected behaviour") if name == :type
         properties.delete_if{|e| e.name == name} # Subset properties override
         properties << Property.new(name, type, options[:default])
       end
@@ -1295,25 +1298,17 @@ module CouchFoo
               allocate
             end
 
-        object.instance_variable_set("@attributes", check_document_types(document))
+        object.instance_variable_set("@attributes", check_document_attributes(document))
         object.instance_variable_set("@attributes_cache", Hash.new)
         object
       end
       
-      # Checks that the document only contains types that are listed as properties.  Also converts 
-      # Date, DateTime and Time types into ruby objects (as we write them to the database in a JSON
-      # format suitable for sorting)
-      def check_document_types(record)
-        property_types.each do |property, type|
-          value = record[property.to_s]
-          if (type == Date || type == DateTime || type == Time)
-            record[property.to_s] = type.send(:parse, value) rescue nil
-          else
-            # Seems pointless but ensures we get attributes for properties that have been added to
-            # model since document last saved 
-            record[property.to_s] = value
-          end
-        end
+      # Checks that the document only contains types that are listed as properties
+      def check_document_attributes(record)
+        # Add new properties
+        (property_names.map{|p| p.to_s} - record.keys).each {|k| record[k] = nil}
+
+        # Remove old properties
         record.reject!{|key, value| !(unchangeable_property_names + property_names).include?(key.to_sym)}
         record
       end
@@ -1941,7 +1936,7 @@ module CouchFoo
     
     def update
       begin
-        response = self.class.database.save(attributes_for_save)
+        response = self.class.database.save(attributes_before_type_cast)
         @attributes["_rev"] = response['rev']
         1
       rescue Exception => e
@@ -1953,7 +1948,7 @@ module CouchFoo
     def create
       @attributes["_id"] = self.class.get_uuid
       begin
-        response = self.class.database.save(attributes_for_save.reject{|key,value| key == "_rev"})
+        response = self.class.database.save(attributes_before_type_cast.reject{|key,value| key == "_rev"})
         @attributes["_rev"] = response['rev']
         @new_record = false
         @attributes["_id"]
@@ -1962,18 +1957,6 @@ module CouchFoo
         logger.error "Unable to create document: #{e.message}"
         false
       end
-    end
-    
-    # Attributes but with date/time types convert to JSON sortable format.  This creates a copy of
-    # the original attributes for saving so doesn't alter the attributes accessible to the user
-    def attributes_for_save
-      attrs = attributes
-      self.class.property_types.each do |name, type|
-        if (type == Date || type == DateTime || type == Time)
-          attrs[name.to_s] = attrs[name.to_s].strftime("%Y/%m/%d %H:%M:%S +0000") if attrs[name.to_s]
-        end
-      end
-      attrs
     end
     
     # Sets the attribute used for inheritance to this class name if this is not the CouchFoo::Base 

@@ -191,15 +191,7 @@ module CouchFoo
     # Returns the value of the attribute identified by <tt>attr_name</tt> after it has been typecast (for example,
     # "2004-12-12" in a data type is cast to a date object, like Date.new(2004, 12, 12)).
     def read_attribute(attr_name)
-      if !(value = @attributes[attr_name.to_s]).nil?
-        if type = type_for_property(attr_name.to_sym)
-          convert_to_type(value, type)
-        else
-          value
-        end
-      else
-        nil
-      end
+      convert_to_type(@attributes[attr_name.to_s], type_for_property(attr_name.to_sym))
     end
 
     def read_attribute_before_type_cast(attr_name)
@@ -211,7 +203,7 @@ module CouchFoo
     def write_attribute(attr_name, value)
       attr_name = attr_name.to_s
       @attributes_cache.delete(attr_name)
-      @attributes[attr_name] = value
+      @attributes[attr_name] = convert_to_json(value, type_for_property(attr_name.to_sym))
     end
 
     def query_attribute(attr_name)
@@ -259,15 +251,46 @@ module CouchFoo
     end
 
     protected
-    # Converts a value to its type, or if not specified tries calling to_json on the value before
-    # falling back on just using the value
-    def convert_to_type(value, type)
+    def convert_to_json(value, type)
       return nil if value.nil?
-      
+
       #Not keen on type hack for case statement
       case type.to_s
         when "String"
-          value
+          value.to_s
+        when "Integer"
+          value.to_i
+        when "Float"
+          value.to_f
+        when "DateTime"
+          DateTime.parse(value.to_s).strftime("%Y/%m/%d %H:%M:%S +0000")
+        when "Time"
+          Time.at(value.to_f).strftime("%Y/%m/%d %H:%M:%S +0000")
+        when "Date"
+          Date.new(value.year, value.month, value.day).strftime("%Y/%m/%d %H:%M:%S +0000")
+        when "TrueClass"
+          convert_boolean(value)
+        when "Boolean"
+          convert_boolean(value)
+        else
+          # Calling to_json on Array or Hash makes them strings = bad
+          if value.is_a?(Array) || value.is_a?(Hash)
+            value
+          else
+            value.to_json rescue value
+          end
+      end
+    end
+
+    # Converts a value to its type, or if not specified tries calling from_json on the value before
+    # falling back on just using the value
+    def convert_to_type(value, type)
+      return nil if value.nil?
+
+      #Not keen on type hack for case statement
+      case type.to_s
+        when "String"
+          value.to_s
         when "Integer"
           value.to_i
         when "Float"
@@ -283,7 +306,7 @@ module CouchFoo
         when "Boolean"
           convert_boolean(value)
         else
-          value.to_json rescue value
+          type.from_json(value) rescue value
       end
     end
 

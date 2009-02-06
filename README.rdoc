@@ -35,7 +35,7 @@ Basic operations are the same as ActiveRecord:
   class Address < CouchFoo::Base
     property :number, Integer
     property :street, String
-    property :postcode # Any generic type is fine as long as .to_json can be called on it
+    property :postcode # Any generic type is fine as long as .to_json and class.from_json(json) can be called on it
   end 
 
   address1 = Address.create(:number => 3, :street => "My Street", :postcode => "secret") # Create address
