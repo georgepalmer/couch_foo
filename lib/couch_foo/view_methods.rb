@@ -122,6 +122,7 @@ module CouchFoo
         search_fields = options.delete(:use_key)
         if search_fields
           search_fields = [search_fields] unless search_fields.is_a?(Array)
+          search_fields = search_fields.sort_by{|f| f.to_s}
         else
           search_fields = options[:conditions].to_a.sort_by{|f| f.first.to_s}.map(&:first)
         end
