@@ -18,7 +18,7 @@ are a few minor differences to the way CouchDB works.  In particular:
 * The price of index updating is paid when next accessing the index rather than the point of insertion.  This can be more efficient or less depending on your application.  It may make sense to use an external process to do the updating for you - see CouchFoo#find for more on this
 * On that note, occasional compacting of CouchDB is required to recover space from old versions of documents.  This can be kicked off in several ways (see quick start guide)
 
-It is recommend that you read the quick start and performance sections in the rdoc for a full overview of differences and points to be aware of when developing.
+It is recommend that you read the quick start and performance sections in the rdoc for a full overview of differences and points to be aware of when developing.  The Changelog file shows the differences between gem versions and should be checked when upgrading gem versions.
 
 
 == Getting started

@@ -32,6 +32,12 @@ module CouchFoo
   class DocumentConflict < CouchFooError
   end
   
+  # The types that are permitted for properties.  At the moment this is just used
+  # to determine whether a .to_xml call should be made on the type during
+  # serialization but I imagine it will be used to enforce type checking as well
+  # at a later date
+  AVAILABLE_TYPES = [String, Integer, Float, DateTime, Time, Date, TrueClass, Boolean]
+
   # Simple class encapsulating a property
   class Property
     attr_accessor :name, :type, :default
@@ -1027,7 +1033,7 @@ module CouchFoo
         define_attr_method :inheritance_column, value, &block
       end
       alias :inheritance_column= :set_inheritance_column
-      
+
       # Set a property for the document.  These can be passed a type and options hash.  If no type
       # is passed a #to_json method is called on the ruby object and the result stored in the 
       # database.  When it is retrieved from the database a class.from_json(json) method is called

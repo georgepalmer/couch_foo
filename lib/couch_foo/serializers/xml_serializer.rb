@@ -2,7 +2,8 @@ module CouchFoo #:nodoc:
   module Serialization
     # Builds an XML document to represent the model. Some configuration is
     # available through +options+. However more complicated cases should
-    # override CouchFoo::Base#to_xml.
+    # override CouchFoo::Base#to_xml.  This is a necessary step if you wish
+    # to use custom types
     #
     # By default the generated XML document will include the processing
     # instruction and all the object's attributes. For example:
@@ -305,13 +306,18 @@ module CouchFoo #:nodoc:
 
       protected
         def compute_type
-          type = @record.class.serialized_attributes.has_key?(name) ? :yaml : @record.class.columns_hash[name].type
+          type = @record.class.property_types[name.to_sym]
+
+          # Hack until get these types into properties structure
+          if name.to_sym == :_id || name.to_sym == :_rev || name.to_sym == :ruby_class
+            type = String
+          end
 
           case type
-            when :text
-              :string
-            when :time
-              :datetime
+            when Time
+              Datetime
+            when Boolean
+              TrueClass
             else
               type
           end
@@ -320,7 +326,10 @@ module CouchFoo #:nodoc:
         def compute_value
           value = @record.send(name)
 
-          if formatter = Hash::XML_FORMATTING[type.to_s]
+          # Custom types must implement .to_xml
+          if !CouchFoo::AVAILABLE_TYPES.include?(type)
+            value.to_xml unless value.nil?
+          elsif formatter = Hash::XML_FORMATTING[type.to_s]
             value ? formatter.call(value) : nil
           else
             value

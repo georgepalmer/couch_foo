@@ -67,6 +67,7 @@ module CouchFoo #:nodoc:
 
     class JsonSerializer < CouchFoo::Serialization::Serializer #:nodoc:
       def serialize
+        puts serializable_record.inspect
         serializable_record.to_json
       end
     end

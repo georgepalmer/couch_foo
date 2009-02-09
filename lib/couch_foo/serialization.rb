@@ -72,7 +72,7 @@ module CouchFoo #:nodoc:
 
       def serializable_record
         returning(serializable_record = {}) do
-          serializable_names.each { |name| serializable_record[name] = @record.send(name) }
+          serializable_names.each { |name| serializable_record[name] = @record.send(:read_attribute_before_type_cast, name) }
           add_includes do |association, records, opts|
             if records.is_a?(Enumerable)
               serializable_record[association] = records.collect { |r| self.class.new(r, opts).serializable_record }

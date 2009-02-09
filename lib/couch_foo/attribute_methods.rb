@@ -11,6 +11,7 @@ module CouchFoo
     end
     
     module ClassMethods
+
       # Declares a method available for all attributes with the given suffix.
       # Uses +method_missing+ and <tt>respond_to?</tt> to rewrite the method
       #

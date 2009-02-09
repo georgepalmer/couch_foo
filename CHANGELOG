@@ -1,0 +1,7 @@
+0.7.0 - Initial release
+0.7.1 - Fixed validates_uniqueness_of bug
+0.7.2 - Fixed readable attribute names for errors
+0.7.3 - Fixed read attribute bug
+0.7.4 - Any type can be used as a property if it provides .to_json and class.from_json methods
+0.7.5 - Issues with jeweler updating gem spec (to functional changes)
+0.7.6 - Introduce serialization support for .to_xml and friends
