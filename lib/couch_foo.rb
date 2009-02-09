@@ -20,7 +20,8 @@ require 'couch_foo/associations'
 #require 'active_record/association_preload'
 #require 'active_record/aggregations'
 require 'couch_foo/timestamp'
-require 'active_record/calculations'
+require 'couch_foo/calculations'
+require 'couch_foo/serialization'
 require 'couch_foo/attribute_methods'
 require 'couch_foo/dirty'
 
@@ -40,4 +41,5 @@ CouchFoo::Base.class_eval do
 #  include ActiveRecord::Aggregations
   include CouchFoo::Reflection
   include CouchFoo::Calculations
+  include CouchFoo::Serialization
 end
