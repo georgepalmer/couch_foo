@@ -268,6 +268,7 @@ module CouchFoo #:nodoc:
 
       def initialize(name, record)
         @name, @record = name, record
+        @name = name.gsub("_", "") if name[0] == '_'[0] # _id and _rev are not valid XML tags
 
         @type  = compute_type
         @value = compute_value
@@ -309,7 +310,7 @@ module CouchFoo #:nodoc:
           type = @record.class.property_types[name.to_sym]
 
           # Hack until get these types into properties structure
-          if name.to_sym == :_id || name.to_sym == :_rev || name.to_sym == :ruby_class
+          if name.to_sym == :id || name.to_sym == :rev || name.to_sym == :ruby_class
             type = String
           end
 

@@ -6,3 +6,4 @@
 0.7.5 - Issues with jeweler updating gem spec (to functional changes)
 0.7.6 - As above
 0.7.7 - Introduce serialization support for .to_xml and friends
+0.7.8 - _id and _rev are not valid XML so converted to id and rev on .to_xml call
