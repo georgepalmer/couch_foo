@@ -19,7 +19,7 @@ module CouchFoo
         reduce_function = nil
         if database.version > 0.8
           reduce_function = count_documents_function
-          search_values[:reduce] = false
+          options[:reduce] = false
         end
         
         generic_view(get_view_name(search_fields), find_by_function(search_fields), reduce_function, options)
@@ -89,8 +89,7 @@ module CouchFoo
       
       # Returns a name for a view
       def get_view_name(search_fields, prefix = "find")
-        ending = search_fields.empty? ? "id" : search_fields.join('_and_')
-        prefix + "_by_" + ending 
+        prefix + "_by_" + search_fields.join('_and_')
       end
       
       # Submit query to database
@@ -126,6 +125,19 @@ module CouchFoo
         else
           search_fields = options[:conditions].to_a.sort_by{|f| f.first.to_s}.map(&:first)
         end
+
+        # If no seach field fall back on :created_at or :id
+        if search_fields.empty?
+          if property_names.include?(:created_at)
+            search_fields << :created_at
+          else
+            search_fields << :_id
+          end
+        end
+
+        # Deal with missing underscore automatically
+        search_fields << :_id if search_fields.delete(:id)
+        search_fields << :_rev if search_fields.delete(:rev)
         search_fields
       end
       

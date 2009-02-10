@@ -173,21 +173,23 @@ module CouchFoo
   # possible to find the oldest 5 users in the system if :created_at isn't exposed in the key.  As 
   # such it is possible to set the key to use with a view directly.  For example:
   #
-  #   Person.find(:first, :use_key => :created_at) # Finds earliest person as results sorted on key
   #   Person.find(:all, :use_key => [:name, :category], :conditions => {:category => "Article"}, :limit => 50) # Finds 50 people with a category of "Article" sorted by name
   #
-  # Note in the second case that we must use the condition keys in the :use_key array. Both of 
-  # these will get the desired results but at the expense of creating a new index.  For more complex
-  # queries it is also possible to specify your own map and reduce functions using the CouchFoo#view 
-  # call.  See the CouchDB view documentation and the CouchFoo#view documentation for more on this  
+  # We must use the condition keys in the :use_key array as we want to restrict the results on this.  
+  # It should be noted that the query will get the desired results but at the expense of creating a
+  # new index so shouldn't be used excessively.  For more complex queries it is also possible to 
+  # specify your own map and reduce functions using the CouchFoo#view call.  See the CouchDB view
+  # documentation and the CouchFoo#view documentation for more on this.
   #
   # Using relational databases with incrementing keys we have become accustom to adding a new record
   # and then using find(:last) to retrieve it.  As each document in CouchDB has a unique identifier 
-  # this is no longer the case.  This is particularly important when creating interfaces as it is 
-  # normal to add items to the bottom of lists and expect on reload for the order to be maintained.  
-  # This will not happen with CouchDB.  As such it is recommend to use the CouchFoo#default_sort 
-  # macro that applies a default sort order to the model each time it's retrieved from the database. 
-  # This way you can set default_sort :created_at and not worry about hitting the problem again.
+  # this may no longer the case.  This is particularly important when creating user interfaces as it 
+  # is normal to add items to the bottom of lists and expect on reload for the order to be maintained.
+  # In couch_foo items are sorted by the :created_at property if it is available and there are no
+  # conditions on the query - eg User.all, User.first  As this is a minor use case it is recommended
+  # to use the CouchFoo#default_sort macro that applies a default sort order to the model each time
+  # it's retrieved from the database.  This way you can set default_sort :created_at and not worry
+  # about hitting the problem again.
   #
   # With CouchDB the price to pay for inserting data into an indexed view isn't paid at insertion
   # time like MySQL and friends, but at the point of next retrieving that view (although it's 
@@ -530,12 +532,12 @@ module CouchFoo
       #   efficiency rather than O(1) (as with ActiveRecord) if using CouchDB<0.9 
       # * Find first - This will return the first record matched by the options used. These options can either be 
       #   specific conditions or merely an order. If no record can be matched, +nil+ is returned. Use
-      #   <tt>Model.find(:first, *args)</tt> or its shortcut <tt>Model.first(*args)</tt>.  Be aware this will return
-      #   the first document by UUID and this isn't always what you expect even when using default_sort (see note above)
+      #   <tt>Model.find(:first, *args)</tt> or its shortcut <tt>Model.first(*args)</tt>.  It is recommended you
+      #   use CouchFoo#default_sort on the model if you wish to use this with ordering.
       # * Find last - This will return the last record matched by the options used. These options can either be 
       #   specific conditions or merely an order. If no record can be matched, +nil+ is returned. Use
-      #   <tt>Model.find(:last, *args)</tt> or its shortcut <tt>Model.last(*args)</tt>.  Be aware this will return
-      #   the last document by UUID and this isn't always what you expect even when using default_sort (see note above)
+      #   <tt>Model.find(:last, *args)</tt> or its shortcut <tt>Model.last(*args)</tt>.  It is recommended you
+      #   use CouchFoo#default_sort on the model if you wish to use this with ordering.
       # * Find all - This will return all the records matched by the options used.
       #   If no records are found, an empty array is returned. Use
       #   <tt>Model.find(:all, *args)</tt> or its shortcut <tt>Model.all(*args)</tt>.
@@ -2007,7 +2009,7 @@ module CouchFoo
       attribs["_rev"] = nil
       attribs["ruby_class"] = self.class.document_class_name
       self.class.properties.inject(attribs) do |attributes, property|
-        attributes[property.name.to_s] = property.default
+        attributes[property.name.to_s] = convert_to_json(property.default, property.type)
         attributes
       end
     end
