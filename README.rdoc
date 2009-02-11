@@ -1,5 +1,31 @@
 = CouchFoo
 
+== Introduction
+
+CouchDB (http://couchdb.apache.org/) works slightly differently to relational databases.  First, 
+and foremost, it is a document-orientated database.  That is, data is stored in documents each 
+of which have a unique id that is used to access and modify it.  The contents of the documents 
+are free from structure (or schema free) and bare no relation to one another (unless you encode 
+that within the documents themselves).  So in many ways documents are like records within a 
+relational database except there are no tables to keep documents of the same type in.
+
+CouchDB interfaces with the external world via a RESTful interface.  This allows document
+creation, updating, deletion etc.  The contents of a document are specified in JSON so its
+possible to serialise objects within the database record efficiently as well as store all the
+normal types natively.
+
+As a consequence of its free form structure there is no SQL to query the database.  Instead you
+define (table-oriented) views that emit certain bits of data from the record and apply 
+conditions, sorting etc to those views.  For example if you were to emit the colour attribute 
+you could find all documents with a certain colour.  This is similar to indexed lookups on a 
+relational table (both in terms of concept and performance).
+
+CouchDB has been designed from the ground up to operate in a distributed way.  It provides 
+robust, incremental replication with bi-directional conflict detection and resolution.  It's an
+excellent choice for unstructed data, large datasets that need sharding efficiently and situations
+where you wish to run local copies of the database.
+
+
 == Overview
 
 CouchFoo provides an ActiveRecord styled interface to CouchDB.  The external API is nearly identical 

@@ -70,7 +70,7 @@ module CouchFoo
   #
   # CouchDB interfaces with the external world via a RESTful interface.  This allows document
   # creation, updating, deletion etc.  The contents of a document are specified in JSON so its
-  # possible to serialise objects with the database record efficiently as well as store all the
+  # possible to serialise objects within the database record efficiently as well as store all the
   # normal types natively.
   #
   # As a consequence of its free form structure there is no SQL to query the database.  Instead you
@@ -1699,7 +1699,7 @@ module CouchFoo
       attrs = clone_attributes(:read_attribute_before_type_cast)
       attributes_protected_by_default.each {|a| attrs.delete(a)}
       record = self.class.new
-      record.attributes = attrs, false
+      record.send :instance_variable_set, '@attributes', attrs
       record
     end
     
