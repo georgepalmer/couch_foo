@@ -9,3 +9,4 @@
 0.7.8 - _id and _rev are not valid XML so converted to id and rev on .to_xml call
 0.7.9 - Make Model.find order by :created_at if no conditions present and fix initialisation of non-native types
 0.7.10 - Fixed clone bug and added CouchDB introduction section to readme
+0.7.11 - Fixed 2nd bug with clone

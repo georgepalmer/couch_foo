@@ -1697,7 +1697,7 @@ module CouchFoo
     
     def clone
       attrs = clone_attributes(:read_attribute_before_type_cast)
-      attributes_protected_by_default.each {|a| attrs.delete(a)}
+      attributes_protected_by_default.each {|a| attrs.delete(a) unless a == "ruby_class"}
       record = self.class.new
       record.send :instance_variable_set, '@attributes', attrs
       record
