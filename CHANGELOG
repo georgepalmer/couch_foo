@@ -11,3 +11,4 @@
 0.7.10 - Fixed clone bug and added CouchDB introduction section to readme
 0.7.11 - Fixed 2nd bug with clone
 0.7.12 - Fix typos in readme
+0.7.13 - Automatically detect CouchDB version, alter set_database parameters, fix conflict bug

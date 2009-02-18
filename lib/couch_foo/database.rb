@@ -1,17 +1,15 @@
 require 'couchrest'
 
 # This class wrappers CouchRest but may ultimately replace it as only parts of the library are used
-module CouchFoo  
-  LATEST_COUCHDB_VERSION = 0.9
-  
+module CouchFoo 
   class DatabaseWrapper
     
     attr_accessor :database, :database_version, :bulk_save_default
     
-    def initialize(database_url, bulk_save_default, version, *args)
-      self.database = CouchRest.database(database_url)
+    def initialize(options, bulk_save_default, *args)
+      self.database = CouchRest.database(options[:host] + "/" + options[:database])
       self.bulk_save_default = bulk_save_default
-      self.database_version = version
+      self.database_version = (JSON.parse(RestClient.get(options[:host]))["version"]).gsub(/-.+/,"").to_f
     end
     
     def save(doc, bulk_save = bulk_save?)
@@ -94,7 +92,8 @@ module CouchFoo
     def handle_exception(exception)
       if exception.is_a?(RestClient::ResourceNotFound)
         raise DocumentNotFound, "Couldn't find document"
-      elsif exception.is_a?(RestClient::RequestFailed) && exception.code == "409"
+      elsif exception.is_a?(RestClient::RequestFailed) && exception.respond_to?(:http_code) && exception.http_code == 412
+        
         raise DocumentConflict, "Document has been updated whilst object loaded"
       else
         # We let the rest fall through as normally CouchDB setup error
@@ -128,6 +127,10 @@ module CouchFoo
       # different databases from their parents.  As such if you only use one database for your
       # application then only one call is required to CouchFoo::Base for initial setup.
       #
+      # When using a database for the first time a version check is performed on CouchDB so that
+      # performance optimisations are run according to your database version.  At time of writing
+      # CouchDB 0.9 offers some good performance gains over 0.8
+      #
       # For ultra-scalability and using a different database for each user, perform the set_database
       # call on the CouchFoo::Base object on a before_filter using the session information to
       # determine the database to connect to.  For example:
@@ -136,7 +139,7 @@ module CouchFoo
       #   before_filter :set_user_database
       #
       #   def set_user_database
-      #     CouchFoo::Base.set_database("http://localhost:5984/user#{session[:user]}")
+      #     CouchFoo::Base.set_database(:host => "http://localhost:5984", :database => "user#{session[:user]}")
       #   end
       # end
       #
@@ -149,8 +152,8 @@ module CouchFoo
       # </ul>
       #
       # NOTE: This will work best on domains where there is little overlap between users data (eg basecamp)
-      def set_database(url, version = LATEST_COUCHDB_VERSION, bulk_save = bulk_save_default)
-        @active_database = DatabaseWrapper.new(url, bulk_save, version)
+      def set_database(options, bulk_save = bulk_save_default)
+        @active_database = DatabaseWrapper.new(options, bulk_save)
       end
     end # ClassMethods
   end

@@ -129,9 +129,8 @@ module CouchFoo
   # CouchDB has a concept called bulk saving where mutliple operations can be built up and commited
   # at once.  This has the added advantage of being in a transaction so all or none of the operations
   # will complete.  By default bulk saving is switched off but you can set the 
-  # CouchFoo::Base.bulk_save_default option or override on an individual database basis if you
-  # wish to use this feature.  If using bulk_saving there are good performance gains when updating
-  # large amounts of documents but beaware it is the developers responsability to commit the work.
+  # CouchFoo::Base.bulk_save_default setting to true to achieve good performance gains when updating
+  # large amounts of documents.  Beware it is the developers responsability to commit the work though.
   # For example:
   # 
   #   User.all.size # => 27
@@ -148,7 +147,7 @@ module CouchFoo
   # the document into memory another person or program has altered its contents.  CouchDB detects
   # this through the _rev attribute.  If a conflict occurs a DocumentConflict error is raised. This
   # is effectively the same as ActiveRecord Optimistic locking mechanism.  Exceptions should be
-  # dealt with in application logic.
+  # dealt with in application logic if using save! - save will just return false
   #
   # On the finders and associations there are a few options that are no longer relevant - :select,
   # :joins, :having, :group, :from and :lock  Everything else is available although :conditions and
@@ -201,16 +200,15 @@ module CouchFoo
   # 
   # Connecting to the database is done in a way similar to ActiveRecord where the database is
   # inherited by each subclass unless overridden.  In CouchFoo you use the call set_database method
-  # with a URL and CouchDB version if you're not on edge (this gem supports 0.8 and 0.9 edge).  As
-  # there's no database connection to be maintained sharding data is very efficient and some
-  # applications even use one database per user.
+  # with a host and database name.  As there's no database connection to be maintained sharding data
+  # is very efficient and some applications even use one database per user.
   # 
   # If using rails, for now you need to specify your own initializer to make the default database
   # connection.  This will be brought inline with rails in the future, using a couchdb.yml 
   # configuration file or similar.  But for now an initializer file in config/initializers like the 
-  # follwing will do the trick:
+  # following will do the trick:
   #
-  #   CouchFoo::Base.set_database("http://localhost:5984/opnli_dev", 0.8)  
+  #   CouchFoo::Base.set_database(:host => "http://localhost:5984", :database => "mydatabase")
   #   CouchFoo::Base.logger = Rails.logger
   #
   # A few tidbits:
@@ -218,7 +216,7 @@ module CouchFoo
   # * validates_uniqueness_of has had the :case_sensitive option dropped
   # * Because there's no SQL there's no SQL finder methods but equally there's no SQL injection to worry about.  You should still sanitize output when displaying back to the user though because you will still be vunerable to JS attacks etc.
   # * Some operations are more efficient than relational databases, others less so.  See the performance section for more details on this
-  # * Every so often the database will need compacting to recover space lost to old document revisions.  See http://wiki.apache.org/couchdb/Compaction for more details on this.
+  # * Every so often the database will need compacting to recover space lost to old document revisions.  More importantly initial indications show un-compacted databases can effect performance.  See http://wiki.apache.org/couchdb/Compaction for more details on this.
   #
   # The following things are not in this implementation (but are in ActiveRecord):
   # * :include - Although the finders and associations allow this option the actual implementation is yet to be written
