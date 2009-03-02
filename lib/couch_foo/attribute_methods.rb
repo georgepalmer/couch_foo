@@ -2,6 +2,7 @@ module CouchFoo
   module AttributeMethods
     DEFAULT_SUFFIXES = %w(= ? _before_type_cast)
     ATTRIBUTE_TYPES_CACHED_BY_DEFAULT = [Time, DateTime, Date]
+    JSON_DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S +0000"
     
     def self.included(base)
       base.extend ClassMethods
@@ -264,11 +265,11 @@ module CouchFoo
         when "Float"
           value.to_f
         when "DateTime"
-          DateTime.parse(value.to_s).strftime("%Y/%m/%d %H:%M:%S +0000")
+          DateTime.parse(value.to_s).strftime(JSON_DATETIME_FORMAT)
         when "Time"
-          Time.at(value.to_f).strftime("%Y/%m/%d %H:%M:%S +0000")
+          Time.at(value.to_f).strftime(JSON_DATETIME_FORMAT)
         when "Date"
-          Date.new(value.year, value.month, value.day).strftime("%Y/%m/%d %H:%M:%S +0000")
+          Date.new(value.year, value.month, value.day).strftime(JSON_DATETIME_FORMAT)
         when "TrueClass"
           convert_boolean(value)
         when "Boolean"

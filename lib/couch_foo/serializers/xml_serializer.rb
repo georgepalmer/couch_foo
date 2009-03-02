@@ -332,6 +332,8 @@ module CouchFoo #:nodoc:
             value.to_xml unless value.nil?
           elsif formatter = Hash::XML_FORMATTING[type.to_s]
             value ? formatter.call(value) : nil
+          elsif type == DateTime || type == Time
+            value.strftime(CouchFoo::AttributeMethods::JSON_DATETIME_FORMAT)
           else
             value
           end
