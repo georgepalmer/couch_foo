@@ -12,3 +12,4 @@
 0.7.11 - Fixed 2nd bug with clone
 0.7.12 - Fix typos in readme
 0.7.13 - Automatically detect CouchDB version, alter set_database parameters, fix conflict bug
+0.7.14 - Fix date/time types in .to_xml
