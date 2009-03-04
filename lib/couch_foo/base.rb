@@ -1825,8 +1825,7 @@ module CouchFoo
     # attributes not included in that won't be allowed to be mass-assigned.
     def attributes=(new_attributes, guard_protected_attributes = true)
       return if new_attributes.nil?
-      attributes = new_attributes.dup
-      attributes.stringify_keys!
+      attributes = normalize_attrs(new_attributes)
 
       multi_parameter_attributes = []
       attributes = remove_attributes_protected_from_mass_assignment(attributes) if guard_protected_attributes
@@ -1973,6 +1972,16 @@ module CouchFoo
       unless self.class.descends_from_couch_foo?
         write_attribute(self.class.inheritance_column, self.class.name)
       end
+    end
+
+    def normalize_attrs(new_attributes)
+      attributes = new_attributes.dup
+      attributes.stringify_keys!
+      id = attributes.delete("id")
+      rev = attributes.delete("rev")
+      attributes["_id"] = id if id
+      attributes["_rev"] = rev if rev
+      attributes
     end
     
     def remove_attributes_protected_from_mass_assignment(attributes)
