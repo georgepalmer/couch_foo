@@ -1,10 +1,10 @@
 Gem::Specification.new do |s|
   s.name = %q{couch_foo}
-  s.version = "0.7.14"
+  s.version = "0.7.15"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["George Palmer"]
-  s.date = %q{2009-03-02}
+  s.date = %q{2009-03-04}
   s.description = %q{CouchFoo provides an ActiveRecord API interface to CouchDB}
   s.email = %q{george.palmer@gmail.com}
   s.files = ["VERSION.yml", "README.rdoc", "lib/boolean.rb", "lib/couch_foo.rb", "lib/couch_foo", "lib/couch_foo/database.rb", "lib/couch_foo/dirty.rb", "lib/couch_foo/serialization.rb", "lib/couch_foo/associations.rb", "lib/couch_foo/associations", "lib/couch_foo/associations/has_one_association.rb", "lib/couch_foo/associations/association_collection.rb", "lib/couch_foo/associations/has_many_association.rb", "lib/couch_foo/associations/belongs_to_association.rb", "lib/couch_foo/associations/association_proxy.rb", "lib/couch_foo/associations/belongs_to_polymorphic_association.rb", "lib/couch_foo/associations/has_and_belongs_to_many_association.rb", "lib/couch_foo/observer.rb", "lib/couch_foo/base.rb", "lib/couch_foo/serializers", "lib/couch_foo/serializers/xml_serializer.rb", "lib/couch_foo/serializers/json_serializer.rb", "lib/couch_foo/calculations.rb", "lib/couch_foo/view_methods.rb", "lib/couch_foo/attribute_methods.rb", "lib/couch_foo/named_scope.rb", "lib/couch_foo/callbacks.rb", "lib/couch_foo/reflection.rb", "lib/couch_foo/validations.rb", "lib/couch_foo/timestamp.rb", "test/couch_foo_test.rb", "test/test_helper.rb"]
