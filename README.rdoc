@@ -66,7 +66,7 @@ Basic operations are the same as ActiveRecord:
 
   address1 = Address.create(:number => 3, :street => "My Street", :postcode => "secret") # Create address
   address2 = Address.create(:number => 27, :street => "Another Street", :postcode => "secret")
-  Address.find.all # = [address1, address2] or maybe [address2, address1] depending on key generation
+  Address.all # = [address1, address2] or maybe [address2, address1] depending on key generation
   Address.first    # = address1 or address2 depending on keys so probably isn't as expected
   Address.find_by_street("My Street") # = address1
 
@@ -81,7 +81,7 @@ results by default:
     default_sort :created_at
   end
   
-  Address.find.all # = [address1, address2]
+  Address.all # = [address1, address2]
   Address.first    # = address1 or address2, sorting is applied after results
   Address.first(:use_key => :created_at) # = address1 but at the price of creating a new index
 
