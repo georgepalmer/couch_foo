@@ -13,5 +13,5 @@
 0.7.12 - Fix typos in readme
 0.7.13 - Automatically detect CouchDB version, alter set_database parameters, fix conflict bug
 0.7.14 - Fix date/time types in .to_xml
-0.7.15 - Allow :id and :rev in attributes= method, although values will be ignored
-0.7.16 - Address.find.all in readme should be Address.all
+0.8.0 - Allow :id and :rev in attributes= method, although values will be ignored.  Minor version change an accident, should have been patch
+0.8.1 - Address.find.all in readme should be Address.all

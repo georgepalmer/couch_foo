@@ -198,8 +198,8 @@ module CouchFoo
       # the key filtering)
       def switch_keys_if_descending!(result)
         if result[:descending]
-          startkey = result[:startkey]
-          endkey = result[:endkey]
+          startkey = result.delete(:startkey)
+          endkey = result.delete(:endkey)
           result[:startkey] = endkey unless endkey.nil?
           result[:endkey] = startkey unless startkey.nil?
         end
