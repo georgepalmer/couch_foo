@@ -1037,10 +1037,11 @@ module CouchFoo
       # Set a property for the document.  These can be passed a type and options hash.  If no type
       # is passed a #to_json method is called on the ruby object and the result stored in the 
       # database.  When it is retrieved from the database a class.from_json(json) method is called
-      # on it or if that doesn't exist it just uses the value.  If a type is passed then the object
-      # is cast before storing in the database.  This does not guarantee that the object is the
-      # correct type (use the validaters for that), it merely tries to convert the current type to
-      # the desired one - for example:
+      # on it or if that doesn't exist it just uses the value (more on this at 
+      # http://www.rowtheboat.com/archives/35).  If a type is passed then the object is cast before 
+      # storing in the database.  This does not guarantee that the object is the correct type (use 
+      # the validaters for that), it merely tries to convert the current type to the desired one
+      # - for example:
       # '123' => 123 # useful
       # 'a' => 0 # probably not desired behaviour
       # The later would fail with a validator

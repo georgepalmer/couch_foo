@@ -15,3 +15,4 @@
 0.7.14 - Fix date/time types in .to_xml
 0.8.0 - Allow :id and :rev in attributes= method, although values will be ignored.  Minor version change an accident, should have been patch
 0.8.1 - Address.find.all in readme should be Address.all
+0.8.2 - Add link to blog post on using objects with models
