@@ -14,7 +14,7 @@ module CouchFoo
     
     def save(doc, bulk_save = bulk_save?)
       begin
-        response = database.save(doc, bulk_save)
+        response = database.save_doc(doc, bulk_save)
         check_response_ok(response)
       rescue Exception => e
         handle_exception(e)
