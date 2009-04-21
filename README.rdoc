@@ -52,7 +52,7 @@ It is recommend that you read the quick start and performance sections in the rd
   CouchFoo::Base.set_database(:host => "http://localhost:5984", :database => "mydatabase")
   CouchFoo::Base.logger = Rails.logger
 
-If using with Rails you will need to create an initializer to do this (until proper integration is added)
+If using with Rails you will need to create an initializer to do this (until proper integration is added).  Also note depending on your version of CouchDB will depend on the version of the CouchREST gem you will require - CouchDB 0.9 requires CouchREST greater than 0.2 and CouchDB 0.8 requires CouchREST between 0.16 and 0.2.  You will be warned on CouchFoo initialization if this is wrong.
 
 
 == Examples of usage
@@ -127,7 +127,7 @@ Please feel free to fork and hit me with a request to merge back in.  At the mom
 * Proper integration with rails using a couchdb.yml config file
 * Example ruby script for updating indexes as an external process, and the same for database compacting  
 * :include for database queries
-* Remove dependency from CouchRest?  Add support for attachments and log calls to server so know performance times.  General tidy up of database.rb
+* Remove dependency from CouchRest - keep support for both CouchDB 0.8 and 0.9 for now.  Add support for attachments and log calls to server so know performance times.  General tidy up of database.rb.  Add support for etags?
 * inline and HABTM inline associations.  Also x_id and x_type properties should be automatically defined
 * compatability with willpaginate and friends
 * cleanup of associations, reflection, validations classes (were modified in a rush)

@@ -16,3 +16,4 @@
 0.8.0 - Allow :id and :rev in attributes= method, although values will be ignored.  Minor version change an accident, should have been patch
 0.8.1 - Address.find.all in readme should be Address.all
 0.8.2 - Add link to blog post on using objects with models
+0.8.3 - Fix API changes in CouchREST, proper exception thrown for non-started CouchDB and catch CouchDB 0.9 new conflict codes

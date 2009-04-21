@@ -9,7 +9,24 @@ module CouchFoo
     def initialize(options, bulk_save_default, *args)
       self.database = CouchRest.database(options[:host] + "/" + options[:database])
       self.bulk_save_default = bulk_save_default
-      self.database_version = (JSON.parse(RestClient.get(options[:host]))["version"]).gsub(/-.+/,"").to_f
+      
+      # Check database ok
+      begin
+        self.database_version = (JSON.parse(RestClient.get(options[:host]))["version"]).gsub(/-.+/,"").to_f
+      rescue Exception => e
+        if e.is_a?(Errno::ECONNREFUSED)
+          raise CouchFooError, "CouchDB not started"
+        else
+          raise CouchFooError, "Error determining CouchDB version"
+        end
+      end
+      
+      # Due to CouchDB view API changes in 0.9 and CouchREST only supporting newer version
+      if version > 0.8 && CouchRest::VERSION.to_f < 0.21
+        raise CouchFooError, "CouchFoo requires CouchRest > 0.2 for use with CouchDB 0.9"
+      elsif version < 0.9 && (CouchRest::VERSION.to_f >= 0.21 || CouchRest::VERSION.to_f <= 0.15)
+        raise CouchFooError, "CouchFoo requires 0.15 < CouchRest < 0.21 for use with CouchDB 0.8"
+      end
     end
     
     def save(doc, bulk_save = bulk_save?)
@@ -92,7 +109,7 @@ module CouchFoo
     def handle_exception(exception)
       if exception.is_a?(RestClient::ResourceNotFound)
         raise DocumentNotFound, "Couldn't find document"
-      elsif exception.is_a?(RestClient::RequestFailed) && exception.respond_to?(:http_code) && exception.http_code == 412
+      elsif exception.is_a?(RestClient::RequestFailed) && exception.respond_to?(:http_code) && (exception.http_code == 412 || exception.http_code == 409)
         
         raise DocumentConflict, "Document has been updated whilst object loaded"
       else
@@ -114,7 +131,7 @@ module CouchFoo
       def database
         if @active_database.nil?
           if self == CouchFoo::Base
-            raise Exception, "No databases setup"
+            raise CouchFooError, "No databases setup"
           else
             superclass.database
           end
