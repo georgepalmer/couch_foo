@@ -1,5 +1,7 @@
 module CouchFoo
-
+# this class was taken from the issues list on Couch Foo
+# see: http://github.com/zedalaye
+# http://github.com/georgepalmer/couch_foo/issues#issue/1
 
   class DatabaseVersion
 
