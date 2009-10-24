@@ -1,4 +1,5 @@
 require 'couchrest'
+require 'couch_foo/database_version.rb'
 
 # This class wrappers CouchRest but may ultimately replace it as only parts of the library are used
 module CouchFoo 
@@ -12,7 +13,7 @@ module CouchFoo
       
       # Check database ok
       begin
-        self.database_version = (JSON.parse(RestClient.get(options[:host]))["version"]).gsub(/-.+/,"").to_f
+        self.database_version = DatabaseVersion.new((JSON.parse(RestClient.get(options[:host]))["version"]).gsub(/-.+/,""))
       rescue Exception => e
         if e.is_a?(Errno::ECONNREFUSED)
           raise CouchFooError, "CouchDB not started"
