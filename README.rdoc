@@ -49,6 +49,12 @@ It is recommend that you read the quick start and performance sections in the rd
 
 == Getting started
 
+To install CouchFoo simply type the following:
+
+  sudo gem install couch_foo --source http://gemcutter.org
+
+You will then need to setup the base class connection and logger:
+
   CouchFoo::Base.set_database(:host => "http://localhost:5984", :database => "mydatabase")
   CouchFoo::Base.logger = Rails.logger
 
