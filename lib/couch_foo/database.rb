@@ -1,5 +1,4 @@
 require 'couchrest'
-require 'couch_foo/database_version.rb'
 
 # This class wrappers CouchRest but may ultimately replace it as only parts of the library are used
 module CouchFoo 
