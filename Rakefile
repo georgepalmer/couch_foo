@@ -11,7 +11,7 @@ begin
     s.authors = ["George Palmer"]
     s.add_dependency "json", [">=0"]
     s.add_dependency "activesupport", [">=0"]
-    s.add_dependency "jchris-couchrest", [">=0.9.12"]
+    s.add_dependency "couchrest", [">=0.9.12"]
     s.add_dependency "uuid", [">=2.0"]
   end
 rescue LoadError
