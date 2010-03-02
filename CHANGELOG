@@ -17,3 +17,5 @@
 0.8.1 - Address.find.all in readme should be Address.all
 0.8.2 - Add link to blog post on using objects with models
 0.8.3 - Fix API changes in CouchREST, proper exception thrown for non-started CouchDB and catch CouchDB 0.9 new conflict codes
+0.8.4 - Improve database version handling
+0.8.5 - Support new RestClient

@@ -12,7 +12,7 @@ module CouchFoo
       
       # Check database ok
       begin
-        self.database_version = DatabaseVersion.new((JSON.parse(RestClient.get(options[:host]))["version"]).gsub(/-.+/,""))
+        self.database_version = DatabaseVersion.new((JSON.parse(RestClient.get(options[:host]).to_s)["version"]).gsub(/-.+/,""))
       rescue Exception => e
         if e.is_a?(Errno::ECONNREFUSED)
           raise CouchFooError, "CouchDB not started"
