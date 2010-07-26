@@ -40,7 +40,7 @@ module CouchFoo
     
     def delete(doc)
       begin
-        response = database.delete(doc)
+        response = database.delete_doc(doc)
         check_response_ok(response)
       rescue Exception => e
         handle_exception(e)
