@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{couch_foo}
-  s.version = "0.8.6"
+  s.version = "0.8.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["George Palmer"]
-  s.date = %q{2010-07-26}
+  s.date = %q{2010-08-18}
   s.description = %q{CouchFoo provides an ActiveRecord API interface to CouchDB}
   s.email = %q{george.palmer@gmail.com}
   s.extra_rdoc_files = [
